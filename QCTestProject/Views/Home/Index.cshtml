@@ -1,0 +1,87 @@
+﻿@{ 
+    ViewBag.Title = "Books";
+}
+    
+<!-- Add new book -->
+    <form class="container p-4 mb-5 border">
+        <h2 class="text-center">Add new book</h2>
+        <div id="fromErrors"></div>
+        <div class="form-row">
+            <div class="form-group col-8">
+                <label>Title</label>
+                <input type="text" class="form-control" id="formTitle" />
+            </div>
+            <div class="form-group col-2">
+                <label>Count of Pages</label>
+                <input type="number" class="form-control" id="formCountOfPages" />
+            </div>
+            <div class="form-group col-2">
+                <label>Year of publication</label>
+                <input type="number" class="form-control" id="formYear" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-4">
+                <label>Author</label>
+                <select class="form-control" id="formAuthorId">
+                </select>
+            </div>
+            <div class="form-group col-4">
+                <label>New Author First Name</label>
+                <input type="text" class="form-control" id="formAuthorFirstName" />
+            </div>
+            <div class="form-group col-4">
+                <label>New Author Last Name</label>
+                <input type="text" class="form-control" id="formAuthorLastName" />
+            </div>
+
+        </div>
+        <div class="form-row">
+            <div class="form-group col">
+                <label>Publisher</label>
+                <select class="form-control" id="formPublisherId">
+                </select>
+            </div>
+            <div class="form-group col">
+                <label>New Publisher Name</label>
+                <input type="text" class="form-control" id="formPublisherName" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col">
+                <label>Language</label>
+                <select class="form-control" id="formLanguageId">
+                </select>
+            </div>
+            <div class="form-group col">
+                <label>New Language Name</label>
+                <input type="text" class="form-control" id="formLanguageName" />
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col">
+                <label>Category</label>
+                <select class="form-control" id="formCategoryId">
+                </select>
+            </div>
+            <div class="form-group col">
+                <label>New Category Name</label>
+                <input type="text" class="form-control" id="formCategoryName" />
+            </div>
+        </div>
+        <div class="form-row mb-2">
+            <button type="reset" class="btn btn-danger w-50">Reset</button>
+            <button type="submit" class="btn btn-primary w-50" id="formSubmit">Submit</button>
+            
+        </div>
+        <div class="form-row">
+            <button type="button" class="btn btn-success w-100" id="saveChanges">Save Changes</button>
+        </div>
+        
+    </form>
+
+
+<!-- All Books -->
+<div id="AllBooks" class="container pt-4 pl-4 pr-4 border">
+    <h2 class="text-center">All books</h2>
+</div>
