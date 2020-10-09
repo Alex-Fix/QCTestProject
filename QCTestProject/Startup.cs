@@ -27,6 +27,7 @@ namespace QCTestProject
             string dbConnection = Configuratin.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(dbConnection));
 
+            services.AddMemoryCache();
             services.AddControllersWithViews();
         }
 

@@ -8,6 +8,11 @@ namespace QCTestProject.Mocks
 {
     public static class Mock
     {
+
+        /// <summary>
+        /// Function for test filling of a database.
+        /// </summary>
+        /// <param name="db"></param>
         public static void FillDB(ApplicationContext db)
         {
             db.Books.RemoveRange(db.Books.ToList());
