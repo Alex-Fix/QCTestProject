@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using QCTestProject.Models;
 using Microsoft.EntityFrameworkCore;
+using QCTestProject.Services;
 
 namespace QCTestProject
 {
@@ -26,7 +27,7 @@ namespace QCTestProject
         {
             string dbConnection = Configuratin.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(dbConnection));
-
+            services.AddTransient<CacheService>();
             services.AddMemoryCache();
             services.AddControllersWithViews();
         }

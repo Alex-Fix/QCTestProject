@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using QCTestProject.Mocks;
 using QCTestProject.Models;
+using QCTestProject.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,11 +17,14 @@ namespace QCTestProject.Controllers
     {
         private ApplicationContext _db;
         private readonly IWebHostEnvironment _env;
+        private IMemoryCache _cache;
 
         public HomeController(ApplicationContext db, IWebHostEnvironment env, IMemoryCache cache)
         {
             _db = db;
             _env = env;
+            _cache = cache;
+            
         }
 
         public IActionResult Index()
@@ -133,10 +137,12 @@ namespace QCTestProject.Controllers
 
 
             
-            
            _db.Books.AddRange(books);
            _db.SaveChanges();
         }
+
+        
+
 
     }
 
