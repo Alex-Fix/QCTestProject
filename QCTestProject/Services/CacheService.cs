@@ -268,6 +268,7 @@ namespace QCTestProject.Services
 
         public void AddCacheItem(CacheItem cacheItem)
         {
+           
             Author locAuthor = _db.Authors.FirstOrDefault(el => el.Id == cacheItem.Author.Id);
             if (locAuthor == null)
             {
@@ -322,6 +323,33 @@ namespace QCTestProject.Services
 
             cacheItem.Book.Id = 0;
             _db.Books.Add(cacheItem.Book);
+            _db.SaveChanges();
+
+            MaxIds maxIds = new MaxIds();
+            if (_db.Books.Count() > 0)
+            {
+                maxIds.MaxBookId = _db.Books.Max(el => el.Id);
+            }
+            if (_db.Categories.Count() > 0)
+            {
+                maxIds.MaxCategoryId = _db.Categories.Max(el => el.Id);
+            }
+            if (_db.Languages.Count() > 0)
+            {
+                maxIds.MaxLanguageId = _db.Languages.Max(el => el.Id);
+            }
+            if (_db.Publishers.Count() > 0)
+            {
+                maxIds.MaxPublisherId = _db.Publishers.Max(el => el.Id);
+            }
+            if (_db.Authors.Count() > 0)
+            {
+                maxIds.MaxAuthorId = _db.Authors.Max(el => el.Id);
+            }
+
+
+            _db.MaxIds.RemoveRange(_db.MaxIds.ToList());
+            _db.MaxIds.Add(maxIds);
 
             int n = _db.SaveChanges();
             if (n > 0)

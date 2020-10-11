@@ -40,6 +40,16 @@ namespace QCTestProject.Controllers
             return RedirectToAction("Index");
         }
 
+        public string GetMaxIds()
+        {
+            MaxIds maxIds = _db.MaxIds.FirstOrDefault();
+            if(maxIds == null)
+            {
+                maxIds = new MaxIds();
+            }
+            return JsonSerializer.Serialize<MaxIds>(maxIds);
+        }
+
         public async Task<string> GetItemIds()
         {
             CacheItemsIds ids = await _cache.GetCacheItemsIds();

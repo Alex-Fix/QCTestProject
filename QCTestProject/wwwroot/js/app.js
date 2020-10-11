@@ -44,34 +44,43 @@
     /* #################################################
                         START INIT DATA
        ################################################# */
-
     $.ajax({
-        url: "/Home/GetItemIds"
+        url: "/Home/GetMaxIds"
     }).then(function (result) {
-        cacheItemsIds = JSON.parse(result);
+        let maxIds = JSON.parse(result);
+        maxBookId = +maxIds.MaxBookId;
+        maxCategoryId = +maxIds.MaxCategoryId;
+        maxLanguageId = +maxIds.MaxLanguageId;
+        maxAuthorId = +maxIds.MaxAuthorId;
+        maxPublisherId = +maxIds.MaxPublisherId;
     }).then(function () {
         $.ajax({
-            url: "/Home/GetBooks",
-            type: "POST",
-            contentType: "application/json; charset=utf-8",
-            data: JSON.stringify(cacheItemsIds.BooksIds)
+            url: "/Home/GetItemIds"
         }).then(function (result) {
-            Books = JSON.parse(result);
+            cacheItemsIds = JSON.parse(result);
         }).then(function () {
             $.ajax({
-                url: "/Home/GetAuthors",
+                url: "/Home/GetBooks",
                 type: "POST",
                 contentType: "application/json; charset=utf-8",
-                data: JSON.stringify(cacheItemsIds.AuthorsIds)
-            }).then(function (result) { MakeMap(result, Authors) }).then(function () {
+                data: JSON.stringify(cacheItemsIds.BooksIds)
+            }).then(function (result) {
+                Books = JSON.parse(result);
+            }).then(function () {
                 $.ajax({
-                    url: "/Home/GetLanguages",
+                    url: "/Home/GetAuthors",
                     type: "POST",
                     contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify(cacheItemsIds.LanguagesIds)
-                }).then(function (result) {
-                    MakeMap(result, Languages)
-                }).then(function () {
+                    data: JSON.stringify(cacheItemsIds.AuthorsIds)
+                }).then(function (result) { MakeMap(result, Authors) }).then(function () {
+                    $.ajax({
+                        url: "/Home/GetLanguages",
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        data: JSON.stringify(cacheItemsIds.LanguagesIds)
+                    }).then(function (result) {
+                        MakeMap(result, Languages)
+                    }).then(function () {
                         $.ajax({
                             url: "/Home/GetPublishers",
                             type: "POST",
@@ -90,13 +99,14 @@
                             }).then(function () {
                                 FillFormSelect();
                                 ShowItems();
-                                FillMaxIds();
                             });
                         });
+                    });
                 });
             });
         });
     });
+    
 
     function MakeMap(json, collection) {
         for (let el of JSON.parse(json)) {
@@ -161,13 +171,6 @@
     }
 
 
-    function FillMaxIds() {
-        cacheItemsIds.BooksIds.length > 0 ? maxBookId = Math.max.apply(null, cacheItemsIds.BooksIds) : maxBookId = 0;
-        cacheItemsIds.AuthorsIds.length > 0 ? maxAuthorId = Math.max.apply(null, cacheItemsIds.AuthorsIds) : maxAuthorId = 0;
-        cacheItemsIds.CategoriesIds.length > 0 ? maxCategoryId = Math.max.apply(null, cacheItemsIds.CategoriesIds) : maxCategoryId = 0;
-        cacheItemsIds.PublishersIds.length > 0 ? maxPublisherId = Math.max.apply(null, cacheItemsIds.PublishersIds) : maxPublisherId = 0;
-        cacheItemsIds.LanguagesIds.length > 0 ? maxLanguageId = Math.max.apply(null, cacheItemsIds.LanguagesIds) : maxLanguageId = 0;
-    }
 
     /* #################################################
                         END SHOW BOOKS
