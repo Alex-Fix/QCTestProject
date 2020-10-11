@@ -349,7 +349,7 @@
 
             FillFormSelect();
             dataWasChanged = true;
-            delBookIds.push(id);
+            delBookIds.push(+book.Id);
         }
     });
 
@@ -477,11 +477,12 @@
             }
             category = new Category(maxCategoryId + 1, CategoryName);
             maxCategoryId++;
-            addCategories.push(category);
+            
             Categories.set(category.Id, category);
         } else {
             category = Categories.get(CategoryId);
         }
+        addCategories.push(category);
 
         let language = null;
         if (LanguageId == -1) {
@@ -491,11 +492,13 @@
             }
             language = new Language(maxLanguageId + 1, LanguageName);
             maxLanguageId++;
-            addLanguages.push(language);
+            
             Languages.set(language.Id, language);
         } else {
             language = Languages.get(LanguageId);
         }
+        addLanguages.push(language);
+
 
         let publisher = null;
         if (PublisherId == -1) {
@@ -505,11 +508,13 @@
             }
             publisher = new Publisher(maxPublisherId + 1, PublisherName);
             maxPublisherId++;
-            addPublishers.push(publisher);
+            
             Publishers.set(publisher.Id, publisher);
         } else {
             publisher = Publishers.get(PublisherId);
         }
+
+        addPublishers.push(publisher);
 
         let author = null;
         if (AuthorId == -1) {
@@ -519,11 +524,13 @@
             }
             author = new Author(maxAuthorId + 1, AuthorFirstName, AuthorLastName);
             maxAuthorId++;
-            addAuthors.push(author);
+            
             Authors.set(author.Id, author);
         } else {
             author = Authors.get(AuthorId);
         }
+        addAuthors.push(author);
+
 
         let ids = [0];
         for (let key of Books) {
@@ -568,22 +575,21 @@
             return;
         }
 
-        let delBooksIdsJson = JSON.stringify(delBookIds);
+        
         let addBooksJson = JSON.stringify(addBooks);
         let addCategoriesJson = JSON.stringify(addCategories);
         let addAuthorsJson = JSON.stringify(addAuthors);
         let addLanguagesJson = JSON.stringify(addLanguages);
         let addPublishersJson = JSON.stringify(addPublishers);
-        let result = [delBooksIdsJson, addBooksJson, addAuthorsJson, addCategoriesJson, addPublishersJson, addLanguagesJson];
+        let result = [addBooksJson, addAuthorsJson, addCategoriesJson, addPublishersJson, addLanguagesJson];
 
         $.ajax({
-            url: "/Home/SyncWithServer",
+            url: "/Home/SyncWithServerForAdd",
             type: "POST",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(result),
             success: function () {
                 dataWasChanged = false;
-                delBookIds.splice(0, delBookIds.length);
                 addBooks.splice(0, addBooks.length);
                 addCategories.splice(0, addCategories.length);
                 addAuthors.splice(0, addAuthors.length);
@@ -591,6 +597,18 @@
                 addPublishers.splice(0, addPublishers.length);
             },
             error: function () { dataWasChanged = true; }
+        }).then(function () {
+            $.ajax({
+                url: "/Home/SyncWithServerForDell",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(delBookIds),
+                success: function () {
+                    dataWasChanged = false;
+                    delBookIds.splice(0, delBookIds.length);
+                },
+                error: function () { dataWasChanged = true; }
+            });
         });
 
 

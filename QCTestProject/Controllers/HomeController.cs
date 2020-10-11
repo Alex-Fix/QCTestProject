@@ -76,24 +76,15 @@ namespace QCTestProject.Controllers
             return JsonSerializer.Serialize<List<Category>>(categories);
         }
 
-        /// <summary>
-        /// ///////////////////
-        /// </summary>
-        /// <param name="result"></param>
+        
         [HttpPost]
-        public async void SyncWithServer([FromBody] List<string> result)
+        public void SyncWithServerForAdd([FromBody] List<string> result)
         {
-            List<int> delBooksIds = JsonSerializer.Deserialize<List<int>>(result[0]);
-            foreach(var el in delBooksIds)
-            {
-                await _cache.DelCacheItem(el);
-            }
-
-            List<Book> addBooks = JsonSerializer.Deserialize<List<Book>>(result[1]);
-            List<Author> addAuthors = JsonSerializer.Deserialize<List<Author>>(result[2]);
-            List<Category> addCategories = JsonSerializer.Deserialize<List<Category>>(result[3]);
-            List<Publisher> addPublishers = JsonSerializer.Deserialize<List<Publisher>>(result[4]);
-            List<Language> addLanguages = JsonSerializer.Deserialize<List<Language>>(result[5]);
+            List<Book> addBooks = JsonSerializer.Deserialize<List<Book>>(result[0]);
+            List<Author> addAuthors = JsonSerializer.Deserialize<List<Author>>(result[1]);
+            List<Category> addCategories = JsonSerializer.Deserialize<List<Category>>(result[2]);
+            List<Publisher> addPublishers = JsonSerializer.Deserialize<List<Publisher>>(result[3]);
+            List<Language> addLanguages = JsonSerializer.Deserialize<List<Language>>(result[4]);
 
             foreach(var el in addBooks)
             {
@@ -105,11 +96,19 @@ namespace QCTestProject.Controllers
                     Publisher = addPublishers.FirstOrDefault(p => p.Id == el.PublisherId),
                     Language = addLanguages.FirstOrDefault(p => p.Id == el.LanguageId),
                 };
+                
                 _cache.AddCacheItem(cacheItem);
             }
-
         }
-        
+
+        [HttpPost]
+        public void SyncWithServerForDell([FromBody] List<int> ids)
+        {
+            foreach (var el in ids)
+            {
+                _cache.DelCacheItem(el);
+            }
+        }
 
 
     }

@@ -197,7 +197,7 @@ namespace QCTestProject.Services
             return publishers;
         }
 
-        public async Task DelCacheItem(int bookId)
+        public  void DelCacheItem(int bookId)
         {
             Book book = null;
             Category category = null;
@@ -209,7 +209,8 @@ namespace QCTestProject.Services
             {
                 _cache.Remove($"Books{bookId}");
             }
-            book = await _db.Books.FirstOrDefaultAsync(el => el.Id == bookId);
+            book =  _db.Books.FirstOrDefault(el => el.Id == bookId);
+           
             if (book != null)
             {
                 if (_db.Books.Where(el => el.AuthorId == book.AuthorId).Count() == 1)
@@ -218,12 +219,22 @@ namespace QCTestProject.Services
                     {
                         _cache.Remove($"Authors{book.AuthorId}");
                     }
+                    author = _db.Authors.FirstOrDefault(el => book.AuthorId == el.Id);
+                    if(author!= null)
+                    {
+                        _db.Authors.Remove(author);
+                    }
                 }
                 if (_db.Books.Where(el => el.CategoryId == book.CategoryId).Count() == 1)
                 {
                     if (_cache.TryGetValue($"Categories{book.CategoryId}", out category))
                     {
                         _cache.Remove($"Categories{book.CategoryId}");
+                    }
+                    category = _db.Categories.FirstOrDefault(el => book.CategoryId == el.Id);
+                    if (category != null)
+                    {
+                        _db.Categories.Remove(category);
                     }
                 }
                 if (_db.Books.Where(el => el.LanguageId == book.LanguageId).Count() == 1)
@@ -232,12 +243,22 @@ namespace QCTestProject.Services
                     {
                         _cache.Remove($"Languages{book.LanguageId}");
                     }
+                    language = _db.Languages.FirstOrDefault(el => book.LanguageId == el.Id);
+                    if (language != null)
+                    {
+                        _db.Languages.Remove(language);
+                    }
                 }
                 if (_db.Books.Where(el => el.PublisherId == book.PublisherId).Count() == 1)
                 {
                     if (_cache.TryGetValue($"Publishers{book.PublisherId}", out publisher))
                     {
                         _cache.Remove($"Publishers{book.PublisherId}");
+                    }
+                    publisher = _db.Publishers.FirstOrDefault(el => book.PublisherId == el.Id);
+                    if (publisher != null)
+                    {
+                        _db.Publishers.Remove(publisher);
                     }
                 }
                 _db.Books.Remove(book);
