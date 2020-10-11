@@ -17,14 +17,13 @@ namespace QCTestProject.Controllers
     {
         private ApplicationContext _db;
         private readonly IWebHostEnvironment _env;
-        private IMemoryCache _cache;
+        private CacheService _cache;
 
-        public HomeController(ApplicationContext db, IWebHostEnvironment env, IMemoryCache cache)
+        public HomeController(ApplicationContext db, IWebHostEnvironment env, CacheService cache)
         {
             _db = db;
             _env = env;
             _cache = cache;
-            
         }
 
         public IActionResult Index()
@@ -41,106 +40,75 @@ namespace QCTestProject.Controllers
             return RedirectToAction("Index");
         }
 
-        public string GetAllItems()
+        public async Task<string> GetItemIds()
         {
-            List<Book> Books = _db.Books.ToList();
-            List<Author> Authors = _db.Authors.ToList();
-            List<Category> Categories = _db.Categories.ToList();
-            List<Publisher> Publishers = _db.Publishers.ToList();
-            List<Language> Languages = _db.Languages.ToList();
-
-            Dictionary<string, string> Items = new Dictionary<string, string>
-            {
-                {"Books", JsonSerializer.Serialize<List<Book>>(Books) },
-                {"Authors", JsonSerializer.Serialize<List<Author>>(Authors) },
-                {"Categories", JsonSerializer.Serialize<List<Category>>(Categories) },
-                {"Publishers", JsonSerializer.Serialize<List<Publisher>>(Publishers) },
-                {"Languages", JsonSerializer.Serialize<List<Language>>(Languages) }
-            };
-
-            string result = JsonSerializer.Serialize<Dictionary<string, string>>(Items);
-
-            return result;
+            CacheItemsIds ids = await _cache.GetCacheItemsIds();
+            return JsonSerializer.Serialize<CacheItemsIds>(ids);
         }
 
+        public async Task<string> GetBooks([FromBody] List<int> ids)
+        {
+            List<Book> books = await _cache.GetBooks(ids);
+            return JsonSerializer.Serialize<List<Book>>(books);
+        }
+
+        public async Task<string> GetAuthors([FromBody] List<int> ids)
+        {
+            List<Author> authors = await _cache.GetAuthors(ids);
+            return JsonSerializer.Serialize<List<Author>>(authors);
+        }
+
+        public async Task<string> GetLanguages([FromBody] List<int> ids)
+        {
+            List<Language> languages = await _cache.GetLanguages(ids);
+            return JsonSerializer.Serialize<List<Language>>(languages);
+        }
+
+        public async Task<string> GetPublishers([FromBody] List<int> ids)
+        {
+            List<Publisher> publishers = await _cache.GetPublishers(ids);
+            return JsonSerializer.Serialize<List<Publisher>>(publishers);
+        }
+
+        public async Task<string> GetCategories([FromBody] List<int> ids)
+        {
+            List<Category> categories = await _cache.GetCategories(ids);
+            return JsonSerializer.Serialize<List<Category>>(categories);
+        }
+
+        /// <summary>
+        /// ///////////////////
+        /// </summary>
+        /// <param name="result"></param>
         [HttpPost]
-        public  void PostAllItems([FromBody] List<string> result)
+        public async void SyncWithServer([FromBody] List<string> result)
         {
-            
-            _db.Books.RemoveRange(_db.Books.ToList());
-            _db.Categories.RemoveRange(_db.Categories.ToList());
-            _db.Languages.RemoveRange(_db.Languages.ToList());
-            _db.Authors.RemoveRange(_db.Authors.ToList());
-            _db.Publishers.RemoveRange(_db.Publishers.ToList());
-
-            List<Language> languages = new List<Language>();
-            foreach (var el in JsonSerializer.Deserialize<List<Language>>(result[2])) 
+            List<int> delBooksIds = JsonSerializer.Deserialize<List<int>>(result[0]);
+            foreach(var el in delBooksIds)
             {
-                languages.Add(new Language
-                {
-                    Name = el.Name
-                }); 
+                await _cache.DelCacheItem(el);
             }
 
-            List<Category> categories = new List<Category>();
-            foreach (var el in JsonSerializer.Deserialize<List<Category>>(result[3]))
+            List<Book> addBooks = JsonSerializer.Deserialize<List<Book>>(result[1]);
+            List<Author> addAuthors = JsonSerializer.Deserialize<List<Author>>(result[2]);
+            List<Category> addCategories = JsonSerializer.Deserialize<List<Category>>(result[3]);
+            List<Publisher> addPublishers = JsonSerializer.Deserialize<List<Publisher>>(result[4]);
+            List<Language> addLanguages = JsonSerializer.Deserialize<List<Language>>(result[5]);
+
+            foreach(var el in addBooks)
             {
-                categories.Add(new Category
+                CacheItem cacheItem = new CacheItem
                 {
-                    Name = el.Name
-                });
+                    Book = el,
+                    Author = addAuthors.FirstOrDefault(p => p.Id == el.AuthorId),
+                    Category = addCategories.FirstOrDefault(p => p.Id == el.CategoryId),
+                    Publisher = addPublishers.FirstOrDefault(p => p.Id == el.PublisherId),
+                    Language = addLanguages.FirstOrDefault(p => p.Id == el.LanguageId),
+                };
+                _cache.AddCacheItem(cacheItem);
             }
 
-            List<Publisher> publishers = new List<Publisher>();
-            foreach (var el in JsonSerializer.Deserialize<List<Publisher>>(result[4]))
-            {
-                publishers.Add(new Publisher
-                {
-                    Name = el.Name
-                });
-            }
-
-            List<Author> authors = new List<Author>();
-            foreach (var el in JsonSerializer.Deserialize<List<Author>>(result[1]))
-            {
-                authors.Add(new Author
-                {
-                    FirstName = el.FirstName,
-                    LastName = el.LastName
-                });
-            }
-
-            
-
-
-            _db.Categories.AddRange(categories);
-            _db.Languages.AddRange(languages);
-            _db.Publishers.AddRange(publishers);
-            _db.Authors.AddRange(authors);
-
-            _db.SaveChanges();
-
-            List<Book> books = new List<Book>();
-            foreach (var el in JsonSerializer.Deserialize<List<Book>>(result[0]))
-            {
-                books.Add(new Book
-                {
-                    Title = el.Title,
-                    Year = el.Year,
-                    CountOfPages = el.CountOfPages,
-                    Author = _db.Authors.FirstOrDefault(p => p.FirstName.Equals(el.Author.FirstName)&&p.LastName.Equals(el.Author.LastName)),
-                    Language = _db.Languages.FirstOrDefault(p => p.Name.Equals(el.Language.Name)),
-                    Category =  _db.Categories.FirstOrDefault(p => p.Name.Equals(el.Category.Name)),
-                    Publisher = _db.Publishers.FirstOrDefault(p => p.Name.Equals(el.Publisher.Name))
-                });
-            }
-
-
-            
-           _db.Books.AddRange(books);
-           _db.SaveChanges();
         }
-
         
 
 

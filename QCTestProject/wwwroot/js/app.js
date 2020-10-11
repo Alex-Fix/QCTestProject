@@ -1,111 +1,120 @@
 ﻿$(function () {
 
-    const UpdateTime = 10000; // ms
+    /* #################################################
+                        START CONSTANTS
+       ################################################# */
 
-    let Books = [];
-    let Categories = new Map();
-    let Authors = new Map();
-    let Languages = new Map();
-    let Publishers = new Map();
+    // Server sync time (seconds)
+    const SERVER_SYNC_TIME = 10;
+
+
+    /* #################################################
+                        END CONSTANTS
+       ################################################# */
+
+    /* #################################################
+                        START DATA
+       ################################################# */
+    let cacheItemsIds = null;
+
+    let Books = [];   //Array
+    let Authors = new Map();  //Map
+    let Categories = new Map();//Map
+    let Languages = new Map();//Map
+    let Publishers = new Map();//Map
 
     let dataWasChanged = false;
+    let delBookIds = [];
+    let addBooks = [];
+    let addCategories = [];
+    let addLanguages = [];
+    let addPublishers = [];
+    let addAuthors = [];
 
-    // Initial
+    let maxBookId = 0;
+    let maxCategoryId = 0;
+    let maxLanguageId = 0;
+    let maxAuthorId = 0;
+    let maxPublisherId = 0;
+
+    /* #################################################
+                        END DATA
+       ################################################# */
+
+    /* #################################################
+                        START INIT DATA
+       ################################################# */
 
     $.ajax({
-        url: "/Home/GetAllItems",
+        url: "/Home/GetItemIds"
     }).then(function (result) {
-        initItems(result);
+        cacheItemsIds = JSON.parse(result);
+    }).then(function () {
+        $.ajax({
+            url: "/Home/GetBooks",
+            type: "POST",
+            contentType: "application/json; charset=utf-8",
+            data: JSON.stringify(cacheItemsIds.BooksIds)
+        }).then(function (result) {
+            Books = JSON.parse(result);
+        }).then(function () {
+            $.ajax({
+                url: "/Home/GetAuthors",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(cacheItemsIds.AuthorsIds)
+            }).then(function (result) { MakeMap(result, Authors) }).then(function () {
+                $.ajax({
+                    url: "/Home/GetLanguages",
+                    type: "POST",
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(cacheItemsIds.LanguagesIds)
+                }).then(function (result) {
+                    MakeMap(result, Languages)
+                }).then(function () {
+                        $.ajax({
+                            url: "/Home/GetPublishers",
+                            type: "POST",
+                            contentType: "application/json; charset=utf-8",
+                            data: JSON.stringify(cacheItemsIds.PublishersIds)
+                        }).then(function (result) {
+                            MakeMap(result, Publishers);
+                        }).then(function () {
+                            $.ajax({
+                                url: "/Home/GetCategories",
+                                type: "POST",
+                                contentType: "application/json; charset=utf-8",
+                                data: JSON.stringify(cacheItemsIds.CategoriesIds)
+                            }).then(function (result) {
+                                MakeMap(result, Categories);
+                            }).then(function () {
+                                FillFormSelect();
+                                ShowItems();
+                                FillMaxIds();
+                            });
+                        });
+                });
+            });
+        });
     });
 
-    // Function for filling data arrays
-    function initItems(result) {
-        AllItems = JSON.parse(result);
-
-        JSON.parse(AllItems["Books"]).forEach(function (curValue, index, array) {
-            Books.push(curValue);
-        });
-        Books.sort((a, b) => Number(b.Id) - Number(a.Id) );
-
-        JSON.parse(AllItems["Categories"]).forEach(function (curValue, index, array) {
-            Categories.set(curValue["Id"], curValue);
-        });
-
-        JSON.parse(AllItems["Authors"]).forEach(function (curValue, index, array) {
-            Authors.set(curValue["Id"], curValue);
-        });
-
-        JSON.parse(AllItems["Languages"]).forEach(function (curValue, index, array) {
-            Languages.set(curValue["Id"], curValue);
-        });
-
-        JSON.parse(AllItems["Publishers"]).forEach(function (curValue, index, array) {
-            Publishers.set(curValue["Id"], curValue);
-        });
-
-        FillFormSelect();
-        ShowItems();
-    }
-
-    //Fill form select
-    function FillFormSelect() {
-        //Categories
-        let cat = [];
-        for (let el of Categories.values()) {
-            cat.push(el);
-        }
-        $("#formCategoryId").empty();
-        $("#formCategoryId").append($('<option>', {value: -1, text: "New Category"}));
-        cat.sort((a, b) => a.Name < b.Name);
-        for (let category of cat) {
-            $('<option>', { value: category.Id, text: category.Name }).appendTo("#formCategoryId");
-        }
-
-        //Publishers
-        let pub = [];
-        for (let el of Publishers.values()) {
-            pub.push(el);
-        }
-        pub.sort((a, b) => a.Name < b.Name);
-        $("#formPublisherId").empty();
-        $("#formPublisherId").append($('<option>', { value: -1, text: "New Publisher" }));
-        for (let publisher of pub) {
-            $('<option>', { value: publisher.Id, text: publisher.Name }).appendTo("#formPublisherId");
-        }
-
-        //Languages
-        let lan = [];
-        for (let el of Languages.values()) {
-            lan.push(el);
-        }
-        lan.sort((a, b) => a.Name < b.Name);
-        $("#formLanguageId").empty();
-        $("#formLanguageId").append($('<option>', { value: -1, text: "New Language" }));
-        for (let language of lan) {
-            $('<option>', { value: language.Id, text: language.Name }).appendTo("#formLanguageId");
-        }
-
-        //Authors
-        let auth = [];
-        for (let el of Authors.values()) {
-            auth.push(el);
-        }
-        auth.sort((a, b) => `${a.FirstName}${a.LastName}` < `${b.FirstName}${b.LastName}`);
-        $("#formAuthorId").empty();
-        $("#formAuthorId").append($('<option>', { value: -1, text: "New Author" }));
-        for (let author of auth) {
-            $('<option>', { value: author.Id, text: `${author.FirstName} ${author.LastName}` }).appendTo("#formAuthorId");
+    function MakeMap(json, collection) {
+        for (let el of JSON.parse(json)) {
+            collection.set(el.Id, el);
         }
     }
+  
+    /* #################################################
+                        END INIT DATA
+       ################################################# */
 
+    /* #################################################
+                        START SHOW BOOKS
+       ################################################# */
 
-    //Show all books on page
     function ShowItems() {
-        
         for (let book of Books) {
-
             makeBookItem(book).appendTo("#AllBooks");
-            
         }
     }
 
@@ -152,7 +161,135 @@
     }
 
 
-    // Del book from page and array
+    function FillMaxIds() {
+        cacheItemsIds.BooksIds.length > 0 ? maxBookId = Math.max.apply(null, cacheItemsIds.BooksIds) : maxBookId = 0;
+        cacheItemsIds.AuthorsIds.length > 0 ? maxAuthorId = Math.max.apply(null, cacheItemsIds.AuthorsIds) : maxAuthorId = 0;
+        cacheItemsIds.CategoriesIds.length > 0 ? maxCategoryId = Math.max.apply(null, cacheItemsIds.CategoriesIds) : maxCategoryId = 0;
+        cacheItemsIds.PublishersIds.length > 0 ? maxPublisherId = Math.max.apply(null, cacheItemsIds.PublishersIds) : maxPublisherId = 0;
+        cacheItemsIds.LanguagesIds.length > 0 ? maxLanguageId = Math.max.apply(null, cacheItemsIds.LanguagesIds) : maxLanguageId = 0;
+    }
+
+    /* #################################################
+                        END SHOW BOOKS
+       ################################################# */
+
+    /* #################################################
+                        START FILL SELECTS
+       ################################################# */
+    
+    function FillFormSelect() {
+        //Categories
+        let cat = [];
+        for (let el of Categories.values()) {
+            cat.push(el);
+        }
+        $("#formCategoryId").empty();
+        $("#formCategoryId").append($('<option>', { value: -1, text: "New Category" }));
+        cat.sort((a, b) => a.Name < b.Name);
+        for (let category of cat) {
+            $('<option>', { value: category.Id, text: category.Name }).appendTo("#formCategoryId");
+        }
+
+        //Publishers
+        let pub = [];
+        for (let el of Publishers.values()) {
+            pub.push(el);
+        }
+        pub.sort((a, b) => a.Name < b.Name);
+        $("#formPublisherId").empty();
+        $("#formPublisherId").append($('<option>', { value: -1, text: "New Publisher" }));
+        for (let publisher of pub) {
+            $('<option>', { value: publisher.Id, text: publisher.Name }).appendTo("#formPublisherId");
+        }
+
+        //Languages
+        let lan = [];
+        for (let el of Languages.values()) {
+            lan.push(el);
+        }
+        lan.sort((a, b) => a.Name < b.Name);
+        $("#formLanguageId").empty();
+        $("#formLanguageId").append($('<option>', { value: -1, text: "New Language" }));
+        for (let language of lan) {
+            $('<option>', { value: language.Id, text: language.Name }).appendTo("#formLanguageId");
+        }
+
+        //Authors
+        let auth = [];
+        for (let el of Authors.values()) {
+            auth.push(el);
+        }
+        auth.sort((a, b) => `${a.FirstName}${a.LastName}` < `${b.FirstName}${b.LastName}`);
+        $("#formAuthorId").empty();
+        $("#formAuthorId").append($('<option>', { value: -1, text: "New Author" }));
+        for (let author of auth) {
+            $('<option>', { value: author.Id, text: `${author.FirstName} ${author.LastName}` }).appendTo("#formAuthorId");
+        }
+    }
+
+    /* #################################################
+                        END FILL SELECTS
+       ################################################# */
+
+    /* #################################################
+                        START CLASSES
+       ################################################# */
+
+
+    class Book {
+        constructor(Id, Title, Year, CountOfPages, AuthorId, Author,
+            PublisherId, Publisher, LanguageId, Language, CategoryId, Category) {
+            this.Id = Id;
+            this.Title = Title;
+            this.Year = Year;
+            this.CountOfPages = CountOfPages;
+            this.AuthorId = AuthorId;
+            this.Author = Author;
+            this.PublisherId = PublisherId;
+            this.Publisher = Publisher;
+            this.LanguageId = LanguageId;
+            this.Language = Language;
+            this.CategoryId = CategoryId;
+            this.Category = Category;
+        }
+
+    }
+
+    class Author {
+        constructor(Id, FirstName, LastName) {
+            this.Id = Id;
+            this.FirstName = FirstName;
+            this.LastName = LastName;
+        }
+    }
+
+    class Publisher {
+        constructor(Id, Name) {
+            this.Id = Id;
+            this.Name = Name;
+        }
+    }
+
+    class Language {
+        constructor(Id, Name) {
+            this.Id = Id;
+            this.Name = Name;
+        }
+    }
+
+    class Category {
+        constructor(Id, Name) {
+            this.Id = Id;
+            this.Name = Name;
+        }
+    }
+    /* #################################################
+                        END CLASSES
+       ################################################# */
+    
+    /* #################################################
+                        START DELETE BOOK
+       ################################################# */
     $("#AllBooks").on("click", "[data-book_id]", function (event) {
         event.preventDefault();
 
@@ -212,59 +349,18 @@
 
             FillFormSelect();
             dataWasChanged = true;
+            delBookIds.push(id);
         }
     });
 
+    /* #################################################
+                        END DELETE BOOK
+       ################################################# */
 
-    //Add new book
-    
-    class Book {
-        constructor(Id, Title, Year, CountOfPages, AuthorId, Author,
-            PublisherId, Publisher, LanguageId, Language, CategoryId, Category) {
-            this.Id = Id;
-            this.Title = Title;
-            this.Year = Year;
-            this.CountOfPages = CountOfPages;
-            this.AuthorId = AuthorId;
-            this.Author = Author;
-            this.PublisherId = PublisherId;
-            this.Publisher = Publisher;
-            this.LanguageId = LanguageId;
-            this.Language = Language;
-            this.CategoryId = CategoryId;
-            this.Category = Category;
-        }
+    /* #################################################
+                       START ADD NEW BOOK
+      ################################################# */
 
-    }
-
-    class Author {
-        constructor(Id, FirstName, LastName) {
-            this.Id = Id;
-            this.FirstName = FirstName;
-            this.LastName = LastName;
-        }
-    }
-
-    class Publisher {
-        constructor(Id, Name) {
-            this.Id = Id;
-            this.Name = Name;
-        }
-    }
-
-    class Language {
-        constructor(Id, Name) {
-            this.Id = Id;
-            this.Name = Name;
-        }
-    }
-
-    class Category {
-        constructor(Id, Name) {
-            this.Id = Id;
-            this.Name = Name;
-        }
-    }
 
     // Add new book
     $("#formSubmit").on("click", function (event) {
@@ -379,7 +475,9 @@
             for (let key of Categories.keys()) {
                 ids.push(parseInt(key));
             }
-            category = new Category(Math.max.apply(null,ids) + 1, CategoryName);
+            category = new Category(maxCategoryId + 1, CategoryName);
+            maxCategoryId++;
+            addCategories.push(category);
             Categories.set(category.Id, category);
         } else {
             category = Categories.get(CategoryId);
@@ -391,7 +489,9 @@
             for (let key of Languages.keys()) {
                 ids.push(parseInt(key));
             }
-            language = new Language(Math.max.apply(null, ids) + 1, LanguageName);
+            language = new Language(maxLanguageId + 1, LanguageName);
+            maxLanguageId++;
+            addLanguages.push(language);
             Languages.set(language.Id, language);
         } else {
             language = Languages.get(LanguageId);
@@ -403,7 +503,9 @@
             for (let key of Publishers.keys()) {
                 ids.push(parseInt(key));
             }
-            publisher = new Publisher(Math.max.apply(null, ids) + 1, PublisherName);
+            publisher = new Publisher(maxPublisherId + 1, PublisherName);
+            maxPublisherId++;
+            addPublishers.push(publisher);
             Publishers.set(publisher.Id, publisher);
         } else {
             publisher = Publishers.get(PublisherId);
@@ -415,7 +517,9 @@
             for (let key of Authors.keys()) {
                 ids.push(parseInt(key));
             }
-            author = new Author(Math.max.apply(null, ids) + 1, AuthorFirstName, AuthorLastName);
+            author = new Author(maxAuthorId + 1, AuthorFirstName, AuthorLastName);
+            maxAuthorId++;
+            addAuthors.push(author);
             Authors.set(author.Id, author);
         } else {
             author = Authors.get(AuthorId);
@@ -425,8 +529,10 @@
         for (let key of Books) {
             ids.push(parseInt(key.Id));
         }
-        let book = new Book(Math.max.apply(null, ids) + 1, Title, Year, CountOfPages, author.Id, author,
+        let book = new Book(maxBookId + 1, Title, Year, CountOfPages, author.Id, author,
             publisher.Id, publisher, language.Id, language, category.Id, category);
+        maxBookId++;
+        addBooks.push(book);
         Books.push(book);
         FillFormSelect();
         dataWasChanged = true;
@@ -442,12 +548,19 @@
         $("#AllBooks").append(bookItem);
     });
 
-    // Update data from the server
+    /* #################################################
+                       END ADD NEW BOOK
+      ################################################# */
+
+
+    /* #################################################
+                       START SYNC WITH SERVER
+      ################################################# */
 
     let timerId = setTimeout(function tick() {
         syncWithServer();
-        timerId = setTimeout(tick, UpdateTime);
-    }, UpdateTime);
+        timerId = setTimeout(tick, SERVER_SYNC_TIME*1000);
+    }, SERVER_SYNC_TIME*1000);
 
     function syncWithServer() {
 
@@ -455,47 +568,38 @@
             return;
         }
 
-        let books = JSON.stringify(Books);
-
-        let authors = [];
-        for (let el of Authors.values()) {
-            authors.push(el);
-        }
-        authors = JSON.stringify(authors);
-
-        let languages = [];
-        for (let el of Languages.values()) {
-            languages.push(el);
-        }
-        languages = JSON.stringify(languages);
-
-        let categories = [];
-        for (let el of Categories.values()) {
-            categories.push(el);
-        }
-        categories = JSON.stringify(categories);
-
-        let publishers = [];
-        for (let el of Publishers.values()) {
-            publishers.push(el);
-        }
-        publishers = JSON.stringify(publishers);
-
-        let result = [books, authors, languages, categories, publishers];
+        let delBooksIdsJson = JSON.stringify(delBookIds);
+        let addBooksJson = JSON.stringify(addBooks);
+        let addCategoriesJson = JSON.stringify(addCategories);
+        let addAuthorsJson = JSON.stringify(addAuthors);
+        let addLanguagesJson = JSON.stringify(addLanguages);
+        let addPublishersJson = JSON.stringify(addPublishers);
+        let result = [delBooksIdsJson, addBooksJson, addAuthorsJson, addCategoriesJson, addPublishersJson, addLanguagesJson];
 
         $.ajax({
-            url: "/Home/PostAllItems",
+            url: "/Home/SyncWithServer",
             type: "POST",
             contentType: "application/json; charset=utf-8",
             data: JSON.stringify(result),
-            success: function () { dataWasChanged = false; },
+            success: function () {
+                dataWasChanged = false;
+                delBookIds.splice(0, delBookIds.length);
+                addBooks.splice(0, addBooks.length);
+                addCategories.splice(0, addCategories.length);
+                addAuthors.splice(0, addAuthors.length);
+                addLanguages.splice(0, addLanguages.length);
+                addPublishers.splice(0, addPublishers.length);
+            },
             error: function () { dataWasChanged = true; }
         });
-       
-        
-        
+
+
+
     }
 
+    /* #################################################
+                       END SYNC WITH SERVER
+      ################################################# */
 
     //Save Changes
     $("#saveChanges").on("click", function (event) {
@@ -511,9 +615,10 @@
     };
 
     $(document).ready(function () {
-        
+
         window.onbeforeunload = set_onbeforeunload;
-        
+
     });
+
 
 });

@@ -155,6 +155,222 @@ namespace QCTestProject.Mocks
                     Publisher = Publishers[3],
                     Language = Languages[0],
                     Category = Categories[1]
+                },
+                new Book
+                {
+                    Title = "Маленькие женщины",
+                    Year = 2017,
+                    CountOfPages = 384,
+                    Author = Authors[0],
+                    Publisher = Publishers[0],
+                    Language = Languages[0],
+                    Category = Categories[0]
+                },
+
+                new Book
+                {
+                    Title = "Бог завжди погрожує інкогніто",
+                    Year = 2016,
+                    CountOfPages = 416,
+                    Author = Authors[1],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Кафе на краю світу",
+                    Year = 2019,
+                    CountOfPages = 128,
+                    Author = Authors[2],
+                    Publisher = Publishers[2],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "#ГАЛЯБЕЗГОЛОВИ",
+                    Year = 2020,
+                    CountOfPages = 400,
+                    Author = Authors[3],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Непобедимое солнце",
+                    Year = 2020,
+                    CountOfPages = 704,
+                    Author = Authors[4],
+                    Publisher = Publishers[3],
+                    Language = Languages[0],
+                    Category = Categories[1]
+                },
+                new Book
+                {
+                    Title = "Маленькие женщины",
+                    Year = 2017,
+                    CountOfPages = 384,
+                    Author = Authors[0],
+                    Publisher = Publishers[0],
+                    Language = Languages[0],
+                    Category = Categories[0]
+                },
+
+                new Book
+                {
+                    Title = "Бог завжди погрожує інкогніто",
+                    Year = 2016,
+                    CountOfPages = 416,
+                    Author = Authors[1],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Кафе на краю світу",
+                    Year = 2019,
+                    CountOfPages = 128,
+                    Author = Authors[2],
+                    Publisher = Publishers[2],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "#ГАЛЯБЕЗГОЛОВИ",
+                    Year = 2020,
+                    CountOfPages = 400,
+                    Author = Authors[3],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Непобедимое солнце",
+                    Year = 2020,
+                    CountOfPages = 704,
+                    Author = Authors[4],
+                    Publisher = Publishers[3],
+                    Language = Languages[0],
+                    Category = Categories[1]
+                },
+                new Book
+                {
+                    Title = "Маленькие женщины",
+                    Year = 2017,
+                    CountOfPages = 384,
+                    Author = Authors[0],
+                    Publisher = Publishers[0],
+                    Language = Languages[0],
+                    Category = Categories[0]
+                },
+
+                new Book
+                {
+                    Title = "Бог завжди погрожує інкогніто",
+                    Year = 2016,
+                    CountOfPages = 416,
+                    Author = Authors[1],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Кафе на краю світу",
+                    Year = 2019,
+                    CountOfPages = 128,
+                    Author = Authors[2],
+                    Publisher = Publishers[2],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "#ГАЛЯБЕЗГОЛОВИ",
+                    Year = 2020,
+                    CountOfPages = 400,
+                    Author = Authors[3],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Непобедимое солнце",
+                    Year = 2020,
+                    CountOfPages = 704,
+                    Author = Authors[4],
+                    Publisher = Publishers[3],
+                    Language = Languages[0],
+                    Category = Categories[1]
+                },
+                new Book
+                {
+                    Title = "Маленькие женщины",
+                    Year = 2017,
+                    CountOfPages = 384,
+                    Author = Authors[0],
+                    Publisher = Publishers[0],
+                    Language = Languages[0],
+                    Category = Categories[0]
+                },
+
+                new Book
+                {
+                    Title = "Бог завжди погрожує інкогніто",
+                    Year = 2016,
+                    CountOfPages = 416,
+                    Author = Authors[1],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Кафе на краю світу",
+                    Year = 2019,
+                    CountOfPages = 128,
+                    Author = Authors[2],
+                    Publisher = Publishers[2],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "#ГАЛЯБЕЗГОЛОВИ",
+                    Year = 2020,
+                    CountOfPages = 400,
+                    Author = Authors[3],
+                    Publisher = Publishers[1],
+                    Language = Languages[1],
+                    Category = Categories[1]
+                },
+
+                new Book
+                {
+                    Title = "Непобедимое солнце",
+                    Year = 2020,
+                    CountOfPages = 704,
+                    Author = Authors[4],
+                    Publisher = Publishers[3],
+                    Language = Languages[0],
+                    Category = Categories[1]
                 }
             };
 
